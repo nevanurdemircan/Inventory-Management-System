@@ -24,7 +24,7 @@ public class UserRepositoryImpl implements UserRepository {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setInt(1, users.getId());
-            preparedStatement.setString(2, users.getType().getValue());
+            preparedStatement.setString(2, users.getType().toString());
             preparedStatement.setString(3, users.getName());
             preparedStatement.setString(4, users.getEmail());
             preparedStatement.setString(5, users.getPassword());
@@ -46,23 +46,28 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Users update(int userId, Users user) {
-        String sql = "UPDATE users SET id =? , type=?, name=?, email=?, password=?, phone=? WHERE id=?";
+        String sql = "UPDATE users SET type=?, name=?, email=?, password=?, phone=? WHERE id=?";
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-            preparedStatement.setInt(1, user.getId());
-            preparedStatement.setString(2, user.getType().getValue());
-            preparedStatement.setString(3, user.getName());
-            preparedStatement.setString(4, user.getEmail());
-            preparedStatement.setString(5, user.getPassword());
-            preparedStatement.setString(6, user.getPhone());
-            preparedStatement.executeUpdate();
-            user.setId(userId);
+            preparedStatement.setString(1, user.getType().toString());
+            preparedStatement.setString(2, user.getName());
+            preparedStatement.setString(3, user.getEmail());
+            preparedStatement.setString(4, user.getPassword());
+            preparedStatement.setString(5, user.getPhone());
+            preparedStatement.setInt(6, userId);
+
+            int affectedRows = preparedStatement.executeUpdate();
+
+            if (affectedRows > 0) {
+                return user;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return user;
+        return null;
     }
+
 
     @Override
     public List<Users> findAll() {
@@ -114,36 +119,30 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     public Users findByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE email = ?";
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        String sql = String.format("SELECT * FROM users WHERE email = %s", email);
+        Users user = null;
 
-            statement.setString(1, email);
-            ResultSet resultSet = statement.executeQuery();
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
 
             if (resultSet.next()) {
-                String password = resultSet.getObject("password") != null ? resultSet.getString("password") : "";
-
-                System.out.println("Password retrieved: " + password);
-
-                if (password == null || password.isEmpty()) {
-                    System.err.println("Password is not set for this user.");
-                    throw new SQLException("Password is not set for the user.");
-                }
-
-                return new Users(
+                user = new Users(
                         resultSet.getInt("id"),
                         resultSet.getString("email"),
-                        password
+                        resultSet.getString("name"),
+                        UserType.valueOf(resultSet.getString("type")),
+                        resultSet.getString("password")
                 );
-            } else {
-                return null;
             }
+
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
+
+        return user;
     }
 
 }

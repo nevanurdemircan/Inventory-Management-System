@@ -12,14 +12,6 @@ public class Bill {
     public Bill() {
     }
 
-    public Bill(int id, int supplierId, int retailerId, double totalPrice, Date date) {
-        this.id = id;
-        this.supplierId = supplierId;
-        this.retailerId = retailerId;
-        this.totalPrice = totalPrice;
-        this.date = date;
-    }
-
     public int getId() {
         return id;
     }

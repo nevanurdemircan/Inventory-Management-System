@@ -18,7 +18,9 @@ public enum ExceptionError {
     EXCHANGE_RATE_NOT_FOUND("Exchange rate with this currency codes is not found", HttpServletResponse.SC_NOT_FOUND),
     BAD_EXCHANGE_RATE_FIELDS("Bad exchange rate fields", HttpServletResponse.SC_BAD_REQUEST),
     BAD_EXCHANGE_FIELDS("Bad exchange fields", HttpServletResponse.SC_BAD_REQUEST),
-    BAD_EXCHANGE_AMOUNT("Bad exchange amount", HttpServletResponse.SC_BAD_REQUEST);
+    BAD_EXCHANGE_AMOUNT("Bad exchange amount", HttpServletResponse.SC_BAD_REQUEST),
+    PRODUCT_NOT_FOUND("Product not found.", HttpServletResponse.SC_BAD_REQUEST);
+
 
     private final String message;
     private final int status;
@@ -28,11 +30,12 @@ public enum ExceptionError {
         this.status = status;
     }
 
-    public String message() {
+
+    public String getMessage() {
         return message;
     }
 
-    public int status() {
+    public int getStatus() {
         return status;
     }
 }

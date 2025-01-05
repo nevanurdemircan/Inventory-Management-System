@@ -21,13 +21,14 @@ public class Users {
         this.password = password;
         this.phone = phone;
     }
-
-    public Users(String email, String password, String type) {
+    public Users(int id, String email, String name, UserType type, String password) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.email = email;
+        this.password = password;
     }
 
-    public Users(int id, String password, String email) {
-
-    }
 
     public int getId() {
         return id;

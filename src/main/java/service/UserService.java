@@ -1,13 +1,14 @@
 package service;
 
 import entity.Users;
+import manager.SingletonManager;
 import repository.UserRepository;
 import repository.impl.UserRepositoryImpl;
 
 import java.util.List;
 
 public class UserService {
-    UserRepository userRepository = new UserRepositoryImpl();
+    private final UserRepository userRepository = SingletonManager.getBean(UserRepositoryImpl.class);
 
     public Users save(Users user) {
         return userRepository.save(user);

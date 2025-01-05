@@ -8,9 +8,7 @@ public class AppException extends RuntimeException {
         this.exceptionError = exceptionError;
     }
 
-
-    public ExceptionError exceptionError() {
+    public ExceptionError getExceptionError() {
         return exceptionError;
     }
-
 }

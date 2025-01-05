@@ -7,15 +7,18 @@ public class Product {
     private double price;
     private double discount;
 
+    private int supplierId;
+
     public Product() {
     }
 
-    public Product(int id, String name, int stockQuantity, double price, double discount) {
+    public Product(int id, String name, int quantity, double price, double discount, int supplierId) {
         this.id = id;
         this.name = name;
-        this.quantity = stockQuantity;
+        this.quantity = quantity;
         this.price = price;
         this.discount = discount;
+        this.supplierId = supplierId;
     }
 
     public int getId() {
@@ -56,5 +59,13 @@ public class Product {
 
     public void setDiscount(double discount) {
         this.discount = discount;
+    }
+
+    public int getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(int supplierId) {
+        this.supplierId = supplierId;
     }
 }

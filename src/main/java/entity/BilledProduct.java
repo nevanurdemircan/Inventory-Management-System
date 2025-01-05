@@ -2,23 +2,11 @@ package entity;
 
 public class BilledProduct {
     private int id;
-    private Bill bill;
+    private int billId;
     private int productId;
-    private Double currentPrice;
-    private Double amount;
-    private Double totalPrice;
-
-    public BilledProduct() {
-    }
-
-    public BilledProduct(int id, Bill bill, int productId, Double currentPrice, Double amount, Double totalPrice) {
-        this.id = id;
-        this.bill = bill;
-        this.productId = productId;
-        this.currentPrice = currentPrice;
-        this.amount = amount;
-        this.totalPrice = totalPrice;
-    }
+    private double currentPrice;
+    private int amount;
+    private double totalPrice;
 
     public int getId() {
         return id;
@@ -28,12 +16,12 @@ public class BilledProduct {
         this.id = id;
     }
 
-    public Bill getBill() {
-        return bill;
+    public int getBillId() {
+        return billId;
     }
 
-    public void setBill(Bill bill) {
-        this.bill = bill;
+    public void setBillId(int billId) {
+        this.billId = billId;
     }
 
     public int getProductId() {
@@ -44,27 +32,27 @@ public class BilledProduct {
         this.productId = productId;
     }
 
-    public Double getCurrentPrice() {
+    public double getCurrentPrice() {
         return currentPrice;
     }
 
-    public void setCurrentPrice(Double currentPrice) {
+    public void setCurrentPrice(double currentPrice) {
         this.currentPrice = currentPrice;
     }
 
-    public Double getAmount() {
+    public int getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(int amount) {
         this.amount = amount;
     }
 
-    public Double getTotalPrice() {
+    public double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Double totalPrice) {
+    public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
 }

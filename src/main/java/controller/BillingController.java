@@ -1,13 +1,16 @@
 package controller;
 
 import com.google.gson.Gson;
+import dto.BillCreateDto;
 import entity.Bill;
-import jakarta.servlet.ServletException;
+import exception.handler.AppExceptionHandler;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import manager.SingletonManager;
 import service.BillingService;
+import util.JsonResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,62 +18,114 @@ import java.util.List;
 
 @WebServlet("/api/bill")
 public class BillingController extends HttpServlet {
-    private BillingService billingService = new BillingService();
+    private final BillingService billingService = SingletonManager.getBean(BillingService.class);
+    private final Gson gson = new Gson();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
+            String retailerIdParam = req.getParameter("retailerId");
             String supplierIdParam = req.getParameter("supplierId");
-            if (supplierIdParam == null || supplierIdParam.trim().isEmpty()) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().write("{\"error\": \"supplierId is required\"}");
+
+            if (retailerIdParam != null && !retailerIdParam.trim().isEmpty()) {
+                int retailerId = Integer.parseInt(retailerIdParam);
+
+                List<Bill> bills = billingService.findAllByRetailerId(retailerId);
+                JsonResponse.send(resp, bills, HttpServletResponse.SC_OK);
                 return;
             }
 
-            int supplierId = Integer.parseInt(supplierIdParam);
-            List<Bill> bills = billingService.findAllBySupplierId(supplierId);
+            if (supplierIdParam != null && !supplierIdParam.trim().isEmpty()) {
+                int supplierId = Integer.parseInt(supplierIdParam);
 
-            Gson gson = new Gson();
-            String jsonResponse = gson.toJson(bills);
+                List<Bill> bills = billingService.findAllBySupplierId(supplierId);
+                JsonResponse.send(resp, bills, HttpServletResponse.SC_OK);
+                return;
+            }
 
-            resp.setContentType("application/json");
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().write(jsonResponse);
-        } catch (NumberFormatException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write("{\"error\": \"Invalid supplierId format\"}");
+            JsonResponse.send(resp, "Invalid query parameters", HttpServletResponse.SC_BAD_REQUEST);
+
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
+            AppExceptionHandler.handle(resp, e);
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Gson gson = new Gson();
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String action = req.getParameter("action");
+
+        if ("save".equalsIgnoreCase(action)) {
+            handleSave(req, resp);
+        } else if ("create".equalsIgnoreCase(action)) {
+            handleCreate(req, resp);
+        } else {
+            JsonResponse.send(resp, "Invalid action parameter", HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String action = req.getParameter("action");
+
+        if ("confirm".equalsIgnoreCase(action)) {
+            handleConfirm(req, resp);
+        } else {
+            JsonResponse.send(resp, "Invalid action parameter", HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
+
+    private void handleSave(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         BufferedReader reader = req.getReader();
         Bill bill = gson.fromJson(reader, Bill.class);
 
         if (bill == null) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write("{\"error\": \"Invalid request body\"}");
+            JsonResponse.send(resp, "Invalid payload", HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         try {
             Bill createdBill = billingService.save(bill);
-
-            resp.setStatus(HttpServletResponse.SC_CREATED);
-            resp.setContentType("application/json");
-            String jsonResponse = gson.toJson(createdBill);
-            resp.getWriter().write(jsonResponse);
-        } catch (IllegalArgumentException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
+            JsonResponse.send(resp, createdBill, HttpServletResponse.SC_OK);
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("{\"error\": \"Something went wrong on the server\"}");
-            e.printStackTrace();
+            AppExceptionHandler.handle(resp, e);
+        }
+    }
+
+    private void handleCreate(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        BufferedReader reader = req.getReader();
+        BillCreateDto payload = gson.fromJson(reader, BillCreateDto.class);
+
+        if (payload == null || payload.getProducts() == null || payload.getProducts().isEmpty()) {
+            JsonResponse.send(resp, "Invalid payload", HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        try {
+            billingService.create(payload);
+            JsonResponse.send(resp, "Bill created successfully", HttpServletResponse.SC_OK);
+        } catch (Exception e) {
+            AppExceptionHandler.handle(resp, e);
+        }
+
+    }
+
+    private void handleConfirm(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String idParam = req.getParameter("id");
+
+        if (idParam == null || idParam.trim().isEmpty()) {
+            JsonResponse.send(resp, "Missing bill ID", HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        try {
+            int billId = Integer.parseInt(idParam);
+
+            billingService.confirm(billId);
+            JsonResponse.send(resp, "Bill confirmed successfully", HttpServletResponse.SC_OK);
+        } catch (NumberFormatException e) {
+            JsonResponse.send(resp, "Invalid bill ID", HttpServletResponse.SC_BAD_REQUEST);
+        } catch (Exception e) {
+            AppExceptionHandler.handle(resp, e);
         }
     }
 }

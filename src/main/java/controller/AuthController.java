@@ -4,25 +4,24 @@ import com.google.gson.Gson;
 import dto.LoginDto;
 import dto.RegisterDto;
 import entity.Users;
-import jakarta.servlet.ServletException;
+import exception.handler.AppExceptionHandler;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import repository.UserRepository;
-import repository.impl.UserRepositoryImpl;
+import manager.SingletonManager;
 import service.AuthService;
+import util.JsonResponse;
 
 import java.io.IOException;
 
 @WebServlet("/api/auth/*")
 public class AuthController extends HttpServlet {
-    private AuthService authService = new AuthService();
-    private UserRepository userRepository = new UserRepositoryImpl();
+    private final AuthService authService =  SingletonManager.getBean(AuthService.class);;
+    private final Gson gson = new Gson();
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
 
         try {
@@ -31,46 +30,33 @@ public class AuthController extends HttpServlet {
             } else if (path.equals("/login")) {
                 handleLogin(req, resp);
             } else {
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().write("{\"error\":\"Invalid endpoint.\"}");
+                JsonResponse.send(resp, "", HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+            AppExceptionHandler.handle(resp, e);
         }
     }
 
-    private Users handleRegister(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Gson gson = new Gson();
+    private void handleRegister(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         RegisterDto registerDto = gson.fromJson(req.getReader(), RegisterDto.class);
-
-        Users user = new Users();
-        user.setName(registerDto.getName());
-        user.setEmail(registerDto.getEmail());
-        user.setPassword(registerDto.getPassword());
-        user.setPhone(registerDto.getPhone());
-        user.setType(registerDto.getType());
-
-        return authService.register(registerDto);
+        Users user = authService.register(registerDto);
+        JsonResponse.send(resp, user, HttpServletResponse.SC_OK);
     }
 
     private void handleLogin(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Gson gson = new Gson();
         LoginDto loginDto = gson.fromJson(req.getReader(), LoginDto.class);
 
         try {
             Users user = authService.login(loginDto);
 
             if (user == null) {
-                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                resp.getWriter().write("{\"error\":\"Invalid email or password.\"}");
-            } else {
-                resp.setStatus(HttpServletResponse.SC_OK);
-                resp.getWriter().write("{\"message\":\"Login successful\",\"userId\":" + user.getId() + "}");
+                JsonResponse.send(resp, "", HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
+
+            JsonResponse.send(resp, user, HttpServletResponse.SC_OK);
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            resp.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+            AppExceptionHandler.handle(resp, e);
         }
     }
 }
