@@ -1,7 +1,5 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container">
-    <a class="navbar-brand" href="index.jsp">Product Store</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -17,7 +15,13 @@
           <a class="nav-link" href="register.jsp">Register</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="cart.jsp">Cart</a>
+          <a class="nav-link" href="cart.jsp">Sepet</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="addProduct.jsp">Yeni Ürün Ekleme</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="searchProduct.jsp">Arama</a>
         </li>
       </ul>
     </div>

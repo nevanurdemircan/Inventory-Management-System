@@ -8,40 +8,52 @@
 <body>
 <%@ include file="/include/navbar.jsp" %>
 
-<div class="container">
-  <div class="row justify-content-center my-5">
-    <div class="col-md-6">
-      <h2 class="text-center">Register</h2>
-      <form action="api/auth/register" method="post">
-        <div class="form-group">
-          <label for="name">Full Name</label>
-          <input type="text" class="form-control" id="name" name="name" required>
-        </div>
-        <div class="form-group">
-          <label for="email">Email address</label>
-          <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <input type="text" class="form-control" id="phone" name="phone" required>
-        </div>
-        <div class="form-group">
-          <label for="type">User Type</label>
-          <select class="form-control" id="type" name="type">
-            <option value="RETAILER">Retailer</option>
-            <option value="SUPPLIER">Supplier</option>
-          </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Register</button>
-      </form>
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registerModalLabel">Register</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="registerForm" action="api/auth/register" method="post">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" class="form-control" id="phone" name="phone" required>
+          </div>
+          <div class="form-group">
+            <label for="type">User Type</label>
+            <select class="form-control" id="type" name="type">
+              <option value="RETAILER">Retailer</option>
+              <option value="SUPPLIER">Supplier</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+      </div>
     </div>
   </div>
 </div>
+
 <script>
+  window.onload = function() {
+    $('#registerModal').modal('show');
+  };
+
   document.getElementById('registerForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
@@ -64,7 +76,6 @@
               console.error('Error:', error);
             });
   });
-
 </script>
 
 <%@ include file="/include/footer.jsp" %>

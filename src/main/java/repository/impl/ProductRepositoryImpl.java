@@ -14,16 +14,15 @@ import java.util.List;
 
 public class ProductRepositoryImpl implements ProductRepository {
     @Override
-    public List<Product> findAllByProductLike(String name, int supplierId) {
+    public List<Product> findAllByProductLike(String name) {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT * FROM product WHERE name LIKE ? AND supplier_id = ?";
+        String sql = "SELECT * FROM product WHERE name LIKE ?";
 
         try (Connection connection = DbConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             String productLikePattern = "%%" + name + "%%";
             preparedStatement.setString(1, productLikePattern);
-            preparedStatement.setInt(2, supplierId);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -44,28 +43,41 @@ public class ProductRepositoryImpl implements ProductRepository {
         return products;
     }
 
-    @Override
+
+        @Override
     public Product save(Product product) {
-        String sql = "INSERT INTO product (id, name, quantity, price, discount, supplier_id) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO product (name, quantity, price, discount, supplier_id) VALUES (?,?,?,?,?)";
 
         try (Connection connection = DbConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setInt(1, product.getId());
-            preparedStatement.setString(2, product.getName());
-            preparedStatement.setInt(3, product.getQuantity());
-            preparedStatement.setDouble(4, product.getPrice());
-            preparedStatement.setDouble(5, product.getDiscount());
-            preparedStatement.setInt(6,product.getSupplierId());
+            preparedStatement.setString(1, product.getName());
+            preparedStatement.setInt(2, product.getQuantity());
+            preparedStatement.setDouble(3, product.getPrice());
+            preparedStatement.setDouble(4, product.getDiscount());
+            preparedStatement.setInt(5, product.getSupplierId());
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         product.setId(generatedKeys.getInt(1));
+
+                        List<String> imageUrls = product.getImageUrlList();
+                        if (imageUrls != null && !imageUrls.isEmpty()) {
+                            String imageSql = "INSERT INTO product_images (product_id, image_url) VALUES (?, ?)";
+                            try (PreparedStatement imageStatement = connection.prepareStatement(imageSql)) {
+                                for (String imageUrl : imageUrls) {
+                                    imageStatement.setInt(1, product.getId());
+                                    imageStatement.setString(2, imageUrl);
+                                    imageStatement.addBatch();
+                                }
+                                imageStatement.executeBatch();
+                            }
+                        }
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return product;
@@ -142,4 +154,44 @@ public class ProductRepositoryImpl implements ProductRepository {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public List<Product> findAll() {
+        List<Product> products = new ArrayList<>();
+        String sql = "SELECT * FROM product";
+        String imageSql = "SELECT image_url FROM product_images WHERE product_id = ?";
+
+        try (Connection connection = DbConnection.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            while (resultSet.next()) {
+                Product product = new Product();
+                product.setId(resultSet.getInt("id"));
+                product.setName(resultSet.getString("name"));
+                product.setPrice(resultSet.getDouble("price"));
+                product.setQuantity(resultSet.getInt("quantity"));
+                product.setDiscount(resultSet.getDouble("discount"));
+                product.setSupplierId(resultSet.getInt("supplier_id"));
+
+                try (PreparedStatement imageStatement = connection.prepareStatement(imageSql)) {
+                    imageStatement.setInt(1, product.getId());
+                    try (ResultSet imageResultSet = imageStatement.executeQuery()) {
+                        List<String> imageUrlList = new ArrayList<>();
+                        while (imageResultSet.next()) {
+                            imageUrlList.add(imageResultSet.getString("image_url"));
+                        }
+                        product.setImageUrlList(imageUrlList);
+                    }
+                }
+
+                products.add(product);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return products;
+    }
+
 }

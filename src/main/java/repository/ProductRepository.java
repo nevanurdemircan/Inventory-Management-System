@@ -5,7 +5,7 @@ import entity.Product;
 import java.util.List;
 
 public interface ProductRepository {
-    List<Product> findAllByProductLike(String name, int supplierId);
+    List<Product> findAllByProductLike(String name);
 
     Product save(Product product);
 
@@ -15,4 +15,5 @@ public interface ProductRepository {
 
     void updateAmount(int id, int amount);
 
+    List<Product> findAll();
 }

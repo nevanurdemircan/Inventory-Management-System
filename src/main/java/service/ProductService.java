@@ -10,8 +10,8 @@ import java.util.List;
 public class ProductService {
     private final ProductRepository productRepository = SingletonManager.getBean(ProductRepositoryImpl.class);
 
-    public List<Product> findAllByProductLike(String name, int supplierId) {
-        return productRepository.findAllByProductLike(name, supplierId);
+    public List<Product> findAllByProductLike(String name) {
+        return productRepository.findAllByProductLike(name);
     }
 
     public Product save(Product product) {
@@ -36,5 +36,9 @@ public class ProductService {
 
     public void reduceAmount(int id, int amount) {
         productRepository.updateAmount(id, amount);
+    }
+
+    public List<Product> findAll(){
+       return productRepository.findAll();
     }
 }

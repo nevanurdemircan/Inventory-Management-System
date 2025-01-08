@@ -1,32 +1,37 @@
 <%@ page import="entity.Product" %>
 <%@ page import="java.util.List" %>
-<%@ page import="entity.Product" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
     List<Product> products = (List<Product>) request.getAttribute("products");
     String baseImage = "https://default-image-url.com/default-product.jpg";
 %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <%@include file="include/header.jsp" %>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory Management System</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .search-bar {
-            margin-bottom: 20px;
-        }
         .product-card img {
             width: 100%;
             height: 200px;
             object-fit: cover;
         }
+        .carousel-inner img {
+            width: 100%;
+            height: 400px;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-<%@include file="include/navbar.jsp" %>
-<div class="container">
-    <div class="card-header my-3">Products</div>
 
+<%@ include file="include/navbar.jsp" %>
+
+<div class="container mt-4">
     <div class="search-bar d-flex justify-content-between">
         <input type="text" id="searchInput" class="form-control w-50" placeholder="Search products by name..." onkeyup="filterProducts()">
         <select id="sortOptions" class="form-select w-25" onchange="sortProducts()">
@@ -37,7 +42,46 @@
             <option value="nameZA">Name: Z to A</option>
         </select>
     </div>
+</div>
 
+<div id="productCarousel" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+        <li data-target="#productCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#productCarousel" data-slide-to="1"></li>
+        <li data-target="#productCarousel" data-slide-to="2"></li>
+    </ol>
+    <div class="carousel-inner">
+        <%
+            if (products != null && products.size() > 0) {
+                for (int i = 0; i < Math.min(3, products.size()); i++) {
+                    Product product = products.get(i);
+                    String imageUrl = (product.getImageUrlList() != null && !product.getImageUrlList().isEmpty())
+                            ? product.getImageUrlList().get(0)
+                            : baseImage;
+        %>
+        <div class="carousel-item <%= i == 0 ? "active" : "" %>">
+            <img class="d-block w-100" src="<%= imageUrl %>" alt="<%= product.getName() %>">
+            <div class="carousel-caption d-none d-md-block">
+                <h5><%= product.getName() %></h5>
+                <p>Price: $<%= product.getPrice() %></p>
+            </div>
+        </div>
+        <%
+                }
+            }
+        %>
+    </div>
+    <a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+</div>
+
+<div class="container mt-5">
     <div class="row" id="productContainer">
         <%
             if (products != null && !products.isEmpty()) {
@@ -76,6 +120,47 @@
     </div>
 </div>
 
-<%@include file="include/footer.jsp" %>
+<%@ include file="include/footer.jsp" %>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function filterProducts() {
+        var input = document.getElementById('searchInput').value.toLowerCase();
+        var productCards = document.querySelectorAll('.product-card');
+
+        productCards.forEach(function(card) {
+            var productName = card.getAttribute('data-name');
+            if (productName.includes(input)) {
+                card.style.display = "";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    }
+
+    function sortProducts() {
+        var sortValue = document.getElementById('sortOptions').value;
+        var productCards = Array.from(document.querySelectorAll('.product-card'));
+
+        productCards.sort(function(a, b) {
+            var priceA = parseFloat(a.getAttribute('data-price'));
+            var priceB = parseFloat(b.getAttribute('data-price'));
+
+            if (sortValue === "priceLowHigh") return priceA - priceB;
+            if (sortValue === "priceHighLow") return priceB - priceA;
+            return 0;
+        });
+
+        var container = document.getElementById('productContainer');
+        container.innerHTML = '';
+        productCards.forEach(function(card) {
+            container.appendChild(card);
+        });
+    }
+</script>
+
 </body>
 </html>
