@@ -14,4 +14,5 @@ public interface ProductRepository {
     List<Product> findAllByIdIn(List<Integer> productIds);
 
     void updateAmount(int id, int amount);
+
 }

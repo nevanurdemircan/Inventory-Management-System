@@ -1,5 +1,7 @@
 package entity;
 
+import java.util.List;
+
 public class Product {
     private int id;
     private String name;
@@ -8,18 +10,21 @@ public class Product {
     private double discount;
 
     private int supplierId;
+    private List<String> imageUrlList;
 
     public Product() {
     }
 
-    public Product(int id, String name, int quantity, double price, double discount, int supplierId) {
-        this.id = id;
+    public Product( String name, int quantity, double price, double discount, int supplierId, List<String> imageUrlList) {
         this.name = name;
         this.quantity = quantity;
         this.price = price;
         this.discount = discount;
         this.supplierId = supplierId;
+        this.imageUrlList = imageUrlList;
+
     }
+
 
     public int getId() {
         return id;
@@ -67,5 +72,13 @@ public class Product {
 
     public void setSupplierId(int supplierId) {
         this.supplierId = supplierId;
+    }
+
+    public List<String> getImageUrlList() {
+        return imageUrlList;
+    }
+
+    public void setImageUrlList(List<String> imageUrlList) {
+        this.imageUrlList = imageUrlList;
     }
 }

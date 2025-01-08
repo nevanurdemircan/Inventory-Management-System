@@ -15,7 +15,6 @@ public class AuthService {
 
     public Users register(RegisterDto registerDto) {
         Users user = new Users();
-        user.setId(registerDto.getId());
         user.setName(registerDto.getName());
         user.setEmail(registerDto.getEmail());
         user.setPassword(registerDto.getPassword());

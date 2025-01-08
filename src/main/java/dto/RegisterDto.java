@@ -3,19 +3,17 @@ package dto;
 import enums.UserType;
 
 public class RegisterDto {
-    private int id;
     private String email;
     private String password;
     private String name;
     private UserType type;
     private String phone;
 
-    public RegisterDto(int id, String email, String password, UserType type, String name, String phone) {
+    public RegisterDto(String email, String password, String name, UserType type, String phone) {
         this.email = email;
         this.password = password;
-        this.type = type;
-        this.id = id;
         this.name = name;
+        this.type = type;
         this.phone = phone;
     }
 
@@ -43,13 +41,6 @@ public class RegisterDto {
         this.type = type;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

@@ -119,27 +119,36 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     public Users findByEmail(String email) {
-        String sql = String.format("SELECT * FROM users WHERE email = %s", email);
+        String sql = "SELECT * FROM users WHERE email = ?";
         Users user = null;
 
         try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            if (resultSet.next()) {
-                user = new Users(
-                        resultSet.getInt("id"),
-                        resultSet.getString("email"),
-                        resultSet.getString("name"),
-                        UserType.valueOf(resultSet.getString("type")),
-                        resultSet.getString("password")
-                );
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("Email parameter is null or empty");
+            }
+
+            statement.setString(1, email);
+            System.out.println("Executing query with email: " + email);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    user = new Users(
+                            resultSet.getInt("id"),
+                            resultSet.getString("email"),
+                            resultSet.getString("name"),
+                            UserType.valueOf(resultSet.getString("type")),
+                            resultSet.getString("password")
+                    );
+                }
             }
 
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
             e.printStackTrace();
-            return null;
+        } catch (IllegalArgumentException e) {
+            System.err.println("Invalid argument: " + e.getMessage());
         }
 
         return user;
