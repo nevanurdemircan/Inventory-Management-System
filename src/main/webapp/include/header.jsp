@@ -1,7 +1,8 @@
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product Store</title>
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-</head>
+<header class="py-5 bg-primary text-white text-center">
+  <div class="container">
+    <h1 class="display-4">Welcome to Our Inventory Management System</h1>
+    <p class="lead">Manage products efficiently and effortlessly.</p>
+    <a href="#products" class="btn btn-light btn-lg">View Products</a>
+  </div>
+</header>
+

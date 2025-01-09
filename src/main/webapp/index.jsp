@@ -1,166 +1,141 @@
-<%@ page import="entity.Product" %>
-<%@ page import="java.util.List" %>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%
-    List<Product> products = (List<Product>) request.getAttribute("products");
-    String baseImage = "https://default-image-url.com/default-product.jpg";
-%>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Management System</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Product List</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
+        .product-card {
+            border: 1px solid #eaeaea;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .product-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
         .product-card img {
-            width: 100%;
             height: 200px;
             object-fit: cover;
         }
-        .carousel-inner img {
-            width: 100%;
-            height: 400px;
+
+        .product-price {
+            color: #28a745;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
-        .search-bar {
-            margin-bottom: 20px;
+
+        .empty-message {
+            text-align: center;
+            color: #6c757d;
+            font-size: 1.2rem;
+            margin-top: 30px;
+        }
+
+        .btn-add-to-cart {
+            background-color: #6c757d !important;
+            color: white !important;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 5px;
+        }
+
+        .btn-add-to-cart:hover {
+            background-color: #6c757d !important;
+            color: white !important;
+        }
+
+        @media (max-width: 768px) {
+            .product-card img {
+                height: auto;
+            }
+
+            .btn-add-to-cart {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-
-<%@ include file="include/navbar.jsp" %>
-
-<div class="container mt-4">
-    <div class="search-bar d-flex justify-content-between">
-        <input type="text" id="searchInput" class="form-control w-50" placeholder="Search products by name..." onkeyup="filterProducts()">
-        <select id="sortOptions" class="form-select w-25" onchange="sortProducts()">
-            <option value="">Sort by</option>
-            <option value="priceLowHigh">Price: Low to High</option>
-            <option value="priceHighLow">Price: High to Low</option>
-            <option value="nameAZ">Name: A to Z</option>
-            <option value="nameZA">Name: Z to A</option>
-        </select>
-    </div>
-</div>
-
-<div id="productCarousel" class="carousel slide" data-ride="carousel">
-    <ol class="carousel-indicators">
-        <li data-target="#productCarousel" data-slide-to="0" class="active"></li>
-        <li data-target="#productCarousel" data-slide-to="1"></li>
-        <li data-target="#productCarousel" data-slide-to="2"></li>
-    </ol>
-    <div class="carousel-inner">
-        <%
-            if (products != null && products.size() > 0) {
-                for (int i = 0; i < Math.min(3, products.size()); i++) {
-                    Product product = products.get(i);
-                    String imageUrl = (product.getImageUrlList() != null && !product.getImageUrlList().isEmpty())
-                            ? product.getImageUrlList().get(0)
-                            : baseImage;
-        %>
-        <div class="carousel-item <%= i == 0 ? "active" : "" %>">
-            <img class="d-block w-100" src="<%= imageUrl %>" alt="<%= product.getName() %>">
-            <div class="carousel-caption d-none d-md-block">
-                <h5><%= product.getName() %></h5>
-                <p>Price: $<%= product.getPrice() %></p>
-            </div>
-        </div>
-        <%
-                }
-            }
-        %>
-    </div>
-    <a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-    </a>
-    <a class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-    </a>
-</div>
+<%@ include file="/include/navbar.jsp" %>
 
 <div class="container mt-5">
-    <div class="row" id="productContainer">
-        <%
-            if (products != null && !products.isEmpty()) {
-                for (Product product : products) {
-        %>
-        <div class="col-md-3 product-card" data-name="<%= product.getName().toLowerCase() %>" data-price="<%= product.getPrice() %>">
-            <div class="card w-100 mb-3" style="width: 18rem;">
-                <%
-                    String imageUrl = (product.getImageUrlList() != null && !product.getImageUrlList().isEmpty())
-                            ? product.getImageUrlList().get(0)
-                            : baseImage;
-                %>
-                <img class="card-img-top" src="<%= imageUrl %>" alt="<%= product.getName() %>">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a href="<%= request.getContextPath() %>/product-detail?id=<%= product.getId() %>" class="text-decoration-none">
-                            <%= product.getName() %>
-                        </a>
-                    </h5>
-                    <div class="d-flex justify-content-between">
-                        <h6 class="price">Price: $<%= product.getPrice() %></h6>
-                        <h6 class="discount text-danger">Discount: <%= Math.round(product.getDiscount() * 100) %>%</h6>
-                    </div>
-                    <h6 class="total-price">Total Price: <%= String.format("%.2f", product.getPrice() * (1 - product.getDiscount())) %></h6>
-                </div>
-            </div>
-        </div>
-        <%
-            }
-        } else {
-        %>
-        <p>No products available.</p>
-        <%
-            }
-        %>
+    <h2 class="text-center mb-4">Product List</h2>
+    <div id="product-container" class="row">
     </div>
 </div>
 
-<%@ include file="include/footer.jsp" %>
-
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 <script>
-    function filterProducts() {
-        var input = document.getElementById('searchInput').value.toLowerCase();
-        var productCards = document.querySelectorAll('.product-card');
+    window.onload = function () {
+        fetch('/products')
+            .then(response => response.json())
+            .then(data => {
+                const productContainer = document.getElementById('product-container');
 
-        productCards.forEach(function(card) {
-            var productName = card.getAttribute('data-name');
-            if (productName.includes(input)) {
-                card.style.display = "";
-            } else {
-                card.style.display = "none";
-            }
-        });
-    }
+                if (data && Array.isArray(data) && data.length > 0) {
+                    productContainer.innerHTML = '';
 
-    function sortProducts() {
-        var sortValue = document.getElementById('sortOptions').value;
-        var productCards = Array.from(document.querySelectorAll('.product-card'));
+                    data.forEach(product => {
+                        const productCard = document.createElement('div');
+                        productCard.className = 'col-md-4 mb-4';
 
-        productCards.sort(function(a, b) {
-            var priceA = parseFloat(a.getAttribute('data-price'));
-            var priceB = parseFloat(b.getAttribute('data-price'));
+                        productCard.innerHTML = `
+                            <div class="card product-card">
+                                <img src="${product.imageUrl}" class="card-img-top" alt="${product.name}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${product.name}</h5>
+                                    <p class="card-text">${product.description}</p>
+                                    <p class="product-price">Price: $${product.price}</p>
+                                    <button class="btn btn-add-to-cart" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Add to Cart</button>
+                                </div>
+                            </div>
+                        `;
 
-            if (sortValue === "priceLowHigh") return priceA - priceB;
-            if (sortValue === "priceHighLow") return priceB - priceA;
-            return 0;
-        });
+                        productContainer.appendChild(productCard);
+                    });
+                } else {
+                    productContainer.innerHTML = '<p class="empty-message">No products available.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching products:', error);
+                const productContainer = document.getElementById('product-container');
+                productContainer.innerHTML = '<p class="text-danger text-center">Failed to load products. Please try again later.</p>';
+            });
+    };
 
-        var container = document.getElementById('productContainer');
-        container.innerHTML = '';
-        productCards.forEach(function(card) {
-            container.appendChild(card);
-        });
+    function addToCart(productId, productName, price) {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const existingProductIndex = cart.findIndex(item => item.productId === productId);
+
+        if (existingProductIndex > -1) {
+            cart[existingProductIndex].quantity += 1;
+        } else {
+            cart.push({
+                productId: productId,
+                name: productName,
+                price: price,
+                quantity: 1
+            });
+        }
+
+        localStorage.setItem('cart', JSON.stringify(cart));
+        alert(`${productName} added to cart!`);
     }
 </script>
 
+<%@ include file="/include/footer.jsp" %>
 </body>
 </html>

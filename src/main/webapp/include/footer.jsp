@@ -1,13 +1,16 @@
-<footer class="bg-light py-4 mt-5">
+<footer class="bg-dark text-white text-center py-4">
   <div class="container">
-    <div class="row">
-      <div class="col-md-6">
-        <p class="text-muted">&copy; 2025 Product Store. All rights reserved.</p>
-      </div>
-      <div class="col-md-6 text-md-end">
-        <a href="#" class="text-muted me-3">Privacy Policy</a>
-        <a href="#" class="text-muted">Terms of Service</a>
-      </div>
-    </div>
+    <p class="mb-0">© 2025 Inventory Management System. All rights reserved.</p>
+    <ul class="list-inline">
+      <li class="list-inline-item">
+        <a href="#" class="text-white">Privacy Policy</a>
+      </li>
+      <li class="list-inline-item">
+        <a href="#" class="text-white">Terms of Service</a>
+      </li>
+      <li class="list-inline-item">
+        <a href="#" class="text-white">Contact Us</a>
+      </li>
+    </ul>
   </div>
 </footer>

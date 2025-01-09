@@ -1,3 +1,4 @@
+
 package controller;
 
 import dto.LoginDto;
@@ -59,22 +60,25 @@ public class AuthController extends HttpServlet {
         String email = req.getParameter("email");
         String password = req.getParameter("password");
 
+        if (email == null || password == null) {
+            resp.sendRedirect(req.getContextPath() + "/login.jsp?error=Missing credentials");
+            return;
+        }
+
         LoginDto loginDto = new LoginDto(email, password);
         Users user = authService.login(loginDto);
         if (user != null) {
-            UserType userType = user.getType();
+            UserType userType = UserType.valueOf(user.getType().name());
 
             req.getSession().setAttribute("user", user);
 
-            String redirectPath = req.getContextPath();
             if ("RETAILER".equalsIgnoreCase(String.valueOf(userType))) {
-                resp.sendRedirect(redirectPath + "/retailerdashboard.jsp");
+                resp.sendRedirect(req.getContextPath() + "/retailerdashboard.jsp");
             } else if ("SUPPLIER".equalsIgnoreCase(String.valueOf(userType))) {
-                resp.sendRedirect(redirectPath + "/supplierdashboard.jsp");
+                resp.sendRedirect(req.getContextPath() + "/supplierdashboard.jsp");
             }
         } else {
             resp.sendRedirect(req.getContextPath() + "/login.jsp?error=Invalid credentials");
         }
     }
-
 }

@@ -43,19 +43,27 @@
                 console.error(error);
             });
     });
-    function addToCart(productId) {
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const existingProductIndex = cart.findIndex(item => item.productId === productId);
 
-        if (existingProductIndex !== -1) {
-            cart[existingProductIndex].quantity++;
+    function addToCart(product) {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        const existingProductIndex = cart.findIndex(item => item.productId === product.productId);
+
+        if (existingProductIndex > -1) {
+            cart[existingProductIndex].quantity = parseInt(cart[existingProductIndex].quantity) + 1;
         } else {
-            cart.push({ productId: productId, quantity: 1 });
+            cart.push({
+                productId: product.productId,
+                productName: product.name,
+                productPrice: product.price,
+                quantity: 1
+            });
         }
 
         localStorage.setItem('cart', JSON.stringify(cart));
-        alert('Product added to cart!');
+        console.log('Sepet güncellendi:', cart);
     }
+
 </script>
 
 <%@ include file="/include/footer.jsp" %>
