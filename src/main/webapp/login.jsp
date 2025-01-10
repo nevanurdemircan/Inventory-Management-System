@@ -12,18 +12,22 @@
     <div class="row justify-content-center my-5">
         <div class="col-md-6">
             <h2 class="text-center">Login</h2>
-            <form action="api/auth/login" method="post">
+
+            <form action="/api/auth/login" method="post">
                 <div class="form-group">
                     <label for="email">Email address</label>
                     <input type="email" class="form-control" id="email" name="email" required>
                 </div>
+
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
-                <div id="error-message" style="color: red; display: none;">
+
+                <div id="error-message" style="color: red; <% if(request.getParameter("error") != null) { %> display: block; <% } else { %> display: none; <% } %>">
                     Invalid credentials, please try again.
                 </div>
+
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
         </div>
@@ -31,6 +35,9 @@
 </div>
 
 <script>
+    window.onload = function() {
+        $('#loginModal').modal('show');
+    };
     document.getElementById('loginForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
@@ -57,6 +64,7 @@
             });
     });
 </script>
+
 
 <%@ include file="/include/footer.jsp" %>
 

@@ -2,7 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
     Users user = (Users) session.getAttribute("user");
-    if (user == null || !"RETAILER".equalsIgnoreCase(String.valueOf(user.getType()))) {
+    if (user == null || !"SUPPLIER".equalsIgnoreCase(String.valueOf(user.getType()))) {
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
@@ -22,8 +22,8 @@
     <h1 class="text-center">Welcome, <%= user.getName() %></h1>
 
     <div class="list-group">
-        <a href="cart.jsp" class="list-group-item list-group-item-action">
-            <i class="fas fa-plus-circle"></i> Siparişleri görüntüle
+        <a href="supplierOrder.jsp" class="list-group-item list-group-item-action">
+            <i class="fas fa-plus-circle"></i> supplier order
         </a>
 
     </div>

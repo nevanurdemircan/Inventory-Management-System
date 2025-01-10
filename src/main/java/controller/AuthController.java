@@ -42,19 +42,30 @@ public class AuthController extends HttpServlet {
         String email = req.getParameter("email");
         String password = req.getParameter("password");
         String phone = req.getParameter("phone");
-        UserType type = UserType.valueOf(req.getParameter("type"));
-        if (type == null) {
-            throw new IllegalArgumentException("Invalid or missing user type.");
+        String typeString = req.getParameter("type");
+
+        if (name == null || email == null || password == null || phone == null || typeString == null) {
+            JsonResponse.send(resp, "All fields are required", HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
+
+        if (!UserType.isValidType(typeString)) {
+            JsonResponse.send(resp, "Invalid user type. Must be 'RETAILER' or 'SUPPLIER'.", HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        UserType type = UserType.valueOf(typeString.toUpperCase());
+
         RegisterDto registerDto = new RegisterDto(email, password, name, type, phone);
         Users user = authService.register(registerDto);
 
         if (user != null) {
-            resp.sendRedirect("/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/login.jsp");
         } else {
             JsonResponse.send(resp, "Registration failed", HttpServletResponse.SC_BAD_REQUEST);
         }
     }
+
 
     private void handleLogin(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String email = req.getParameter("email");
