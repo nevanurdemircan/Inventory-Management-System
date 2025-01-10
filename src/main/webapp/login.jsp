@@ -4,6 +4,55 @@
 <head>
     <title>Login</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7fc;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+
+        .form-group input, .form-group select {
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            border-radius: 0.375rem;
+        }
+
+        .alert-info {
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        hr {
+            border-color: #ddd;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            font-size: 1rem;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+        .form-text {
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
+
 </head>
 <body>
 <%@ include file="/include/navbar.jsp" %>
@@ -28,8 +77,9 @@
                     Invalid credentials, please try again.
                 </div>
 
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
             </form>
+            <p>Don't have an account? <a href="/index.jsp">Login here</a></p>
         </div>
     </div>
 </div>

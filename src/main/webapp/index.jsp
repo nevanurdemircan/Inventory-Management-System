@@ -1,141 +1,149 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product List</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-
+    <title>Register</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .product-card {
-            border: 1px solid #eaeaea;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        body {
+            background-color: #f4f7fc;
         }
 
-        .product-card:hover {
-            transform: scale(1.03);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
         }
 
-        .product-card img {
-            height: 200px;
-            object-fit: cover;
+        .form-group input, .form-group select {
+            font-size: 1.1rem;
         }
 
-        .product-price {
-            color: #28a745;
-            font-size: 1.2rem;
-            font-weight: bold;
+        .form-control {
+            border-radius: 0.375rem;
         }
 
-        .empty-message {
-            text-align: center;
-            color: #6c757d;
-            font-size: 1.2rem;
-            margin-top: 30px;
+        .alert-info {
+            font-size: 1rem;
+            margin-bottom: 30px;
         }
 
-        .btn-add-to-cart {
-            background-color: #6c757d !important;
-            color: white !important;
-            border: none;
-            padding: 0.5rem 1rem;
+        hr {
+            border-color: #ddd;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            font-size: 1rem;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+        .form-text {
             font-size: 0.9rem;
-            border-radius: 5px;
-        }
-
-        .btn-add-to-cart:hover {
-            background-color: #6c757d !important;
-            color: white !important;
-        }
-
-        @media (max-width: 768px) {
-            .product-card img {
-                height: auto;
-            }
-
-            .btn-add-to-cart {
-                font-size: 1rem;
-            }
+            color: #888;
         }
     </style>
 </head>
 <body>
 <%@ include file="/include/navbar.jsp" %>
+<div class="container">
+    <h2 class="text-center">Register</h2>
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Product List</h2>
-    <div id="product-container" class="row">
-    </div>
+    <%
+        String loggedInUser = (String) session.getAttribute("user");
+
+        if (loggedInUser != null) {
+
+    } else {
+    %>
+    <form id="registerForm" action="/api/auth/register" method="post">
+        <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" class="form-control" required placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" required placeholder="Enter your email address">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" required placeholder="Enter your password">
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="text" id="phone" name="phone" class="form-control" required placeholder="Enter your phone number">
+        </div>
+
+        <div class="form-group">
+            <label for="type">User Type</label>
+            <select id="type" name="type" class="form-control" required>
+                <option value="RETAILER">Retailer</option>
+                <option value="SUPPLIER">Supplier</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Register</button>
+    </form>
+
+    <hr>
+
+    <p>Already have an account?  <a href="/login.jsp">Login here</a></p>
+    <%
+        }
+    %>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
 <script>
-    window.onload = function () {
-        fetch('/products')
-            .then(response => response.json())
-            .then(data => {
-                const productContainer = document.getElementById('product-container');
+    document.getElementById("registerForm").addEventListener("submit", function(event) {
+        event.preventDefault();
 
-                if (data && Array.isArray(data) && data.length > 0) {
-                    productContainer.innerHTML = '';
-
-                    data.forEach(product => {
-                        const productCard = document.createElement('div');
-                        productCard.className = 'col-md-4 mb-4';
-
-                        productCard.innerHTML = `
-                            <div class="card product-card">
-                                <img src="${product.imageUrl}" class="card-img-top" alt="${product.name}">
-                                <div class="card-body">
-                                    <h5 class="card-title">${product.name}</h5>
-                                    <p class="card-text">${product.description}</p>
-                                    <p class="product-price">Price: $${product.price}</p>
-                                    <button class="btn btn-add-to-cart" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Add to Cart</button>
-                                </div>
-                            </div>
-                        `;
-
-                        productContainer.appendChild(productCard);
-                    });
+        const formData = new FormData(this);
+        fetch("/api/auth/register", {
+            method: "POST",
+            body: new URLSearchParams(formData),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
                 } else {
-                    productContainer.innerHTML = '<p class="empty-message">No products available.</p>';
+                    throw new Error("Registration failed.");
+                }
+            })
+            .then(data => {
+                if (data.message === "Registration successful") {
+                    window.location.href = "/login.jsp";
+                } else {
+                    alert("Registration failed: " + data.message);
                 }
             })
             .catch(error => {
-                console.error('Error fetching products:', error);
-                const productContainer = document.getElementById('product-container');
-                productContainer.innerHTML = '<p class="text-danger text-center">Failed to load products. Please try again later.</p>';
+                console.error("Error during form submission:", error);
+                window.location.href = "/login.jsp";
             });
-    };
-
-    function addToCart(productId, productName, price) {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        const existingProductIndex = cart.findIndex(item => item.productId === productId);
-
-        if (existingProductIndex > -1) {
-            cart[existingProductIndex].quantity += 1;
-        } else {
-            cart.push({
-                productId: productId,
-                name: productName,
-                price: price,
-                quantity: 1
-            });
-        }
-
-        localStorage.setItem('cart', JSON.stringify(cart));
-        alert(`${productName} added to cart!`);
-    }
+    });
 </script>
 
 <%@ include file="/include/footer.jsp" %>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
